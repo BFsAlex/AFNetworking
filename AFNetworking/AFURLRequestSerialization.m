@@ -104,7 +104,9 @@ NSString * AFPercentEscapedStringFromString(NSString *string) {
 - (NSString *)URLEncodedStringValue {
     if (!self.value || [self.value isEqual:[NSNull null]]) {
         return AFPercentEscapedStringFromString([self.field description]);
-    } else {
+    }else if(!self.field || [self.field isEqual:[NSNull null]]){
+        return [NSString stringWithFormat:@"%@",self.value];
+    }else {
         return [NSString stringWithFormat:@"%@=%@", AFPercentEscapedStringFromString([self.field description]), AFPercentEscapedStringFromString([self.value description])];
     }
 }
@@ -146,7 +148,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     } else if ([value isKindOfClass:[NSArray class]]) {
         NSArray *array = value;
         for (id nestedValue in array) {
-            [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue([NSString stringWithFormat:@"%@[]", key], nestedValue)];
+            [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue([NSString stringWithFormat:@"%@[%lu]", key, (unsigned long)[array indexOfObject:nestedValue]], nestedValue)];
         }
     } else if ([value isKindOfClass:[NSSet class]]) {
         NSSet *set = value;
